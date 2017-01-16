@@ -54,20 +54,24 @@ ine_notes <- ine_notes %>%
 
 # 5) TABLE DATA
 # Read Aparent Cement Consumption
-cement_ine <- read_excel(file_path, sheet = "tabla-0", skip = 5)
-cement_ine <- cement[-c(12:18), ]
+ine_cement <- read_excel(file_path, sheet = "tabla-0", skip = 5)
+ine_cement <- ine_cement[-c(12:18), ]
 
-cement <- sapply(cement[2, c(2:263)], as.numeric)
-cement <- ts(cement, start = c(1995, 1), end = c(2016, 10), deltat = 1/12)
+ine_cement <- sapply(ine_cement[2, c(2:263)], as.numeric)
 
+# Time Series
+ine_cement <- ts(ine_cement,
+                 start = c(1995, 1),
+                 end = c(2016, 10),
+                 deltat = 1/12)
 
 
 # 6) VIEW AND PLOT DATA
-cement
+ine_cement
 
-summary(cement)
+summary(ine_cement)
 
-plot(decompose(cement, type = "multiplicative"))
+plot(decompose(ine_cement, type = "multiplicative"))
 
-dygraph(cement) %>%
+dygraph(ine_cement) %>%
   dyRangeSelector()
