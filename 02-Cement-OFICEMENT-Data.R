@@ -17,21 +17,24 @@
 # https://www.oficemen.com/show_doc.asp?id_doc=692
 
 
+# 1) LOAD PACKAGES 
 library(pdftools)
 library(dygraphs)
 
 
+# 2) DATA SOURCE
 data_url <- "https://www.oficemen.com/show_doc.asp?id_doc=692"
 pdf_file <- "Evolución histórica mensual del consumo de cemento en España.pdf"
 data_path <- "data/"
 
 pdf_file <- paste0(data_path, pdf_file)
 
+# 3) DOWNLOAD PDF
 download.file(data_url,
               pdf_file,
               mode = "wb")
 
-# Convert pdf to text and clean.
+# 4) EXTRACT TEXT AND CLEAN
 txt <- pdf_file %>%
   pdf_text %>%
   # Remove anotation "(1)"
@@ -50,6 +53,7 @@ txt  <- scan(text = txt, what = "", sep = "\n", nlines = 14L) %>%
 
 txt[[1]] <- c("" , txt[[1]])
 
+# 5) CONVERT TO DATA.FRAME 
 # Cement data.frame
 oficement_cement <- data.frame(txt[-c(1)], stringsAsFactors = FALSE)
 
@@ -73,12 +77,21 @@ oficement_cement <- as.data.frame(oficement_cement)
 oficement_cement$Total <- NULL
 
 
-# Time Series
+# 6) CONVERT TO TIME SERIES
 oficement_cement <- oficement_cement %>%
   t %>%
   data.frame %>%
   unlist(., use.names = FALSE) %>%
   ts(start = c(2006, 1), end = c(2015, 12), deltat = 1/12)
+
+
+# 7) VIEW AND PLOT DATA
+
+oficement_cement
+
+summary(oficement_cement)
+
+plot(decompose(oficement_cement, type = "multiplicative"))
 
 dygraph(oficement_cement) %>%
   dyRangeSelector()

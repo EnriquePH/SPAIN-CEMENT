@@ -39,7 +39,7 @@ ine_header %>%
   cat(., "\n")
 
 
-# 4) ANNOTATIONS
+# 4) NOTES
 ine_notes <- read_excel(ine_file_path, sheet = "tabla-0", skip = 18)
 
 ine_notes <- ine_notes %>%
@@ -48,8 +48,6 @@ ine_notes <- ine_notes %>%
   gsub("\\.", ".\n", .) %>%
   gsub("[[:blank:]]+", " ", .) %>%
   cat
-
-
 
 
 # 5) TABLE DATA
