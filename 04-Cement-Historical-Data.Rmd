@@ -1,60 +1,80 @@
-#  ----------------------------------------------------------------------------
-#  SPAIN CEMENT FORECAST
-#  Reads data from Excel downloaded from http://tematicas.org
-#  File: 03-Cement-TEMATICAS-Data.R
-#  (c) 2017 - Enrique Pérez Herrero
-#  email: eph.project1500@gmail.com
-#  Apache License Version 2.0, January 2004
-#  Start: 16/Jan/2017
-#  End:   17/Jan/2017
-#  Data: Consumo Aparente de Cemento (miles de Tm)
-#  Source: INE
-#  http://tematicas.org
-#  ----------------------------------------------------------------------------
+---
+title: "Apparent Cement Consumption in Spain: Historical Data"
+author: "Enrique Pérez Herrero"
+date: "January 18, 2017"
+output: 
+  html_document: 
+    fig_width: 9
+    highlight: tango
+    number_sections: yes
+    theme: cosmo
+    toc: yes
+---
 
 
-# 1) LOAD PACKAGES 
+# Summary
 
+Resumen: 
+
+# Load Packages 
+
+```{r, warning=FALSE, message=FALSE}
 library(xml2)
 library(rvest)
 library(dygraphs)
 library(xts)
+```
 
 
+# Data Source
 
-# 2) DATA SOURCE
-
+```{r}
 data_url <- paste0("http://tematicas.org/",
                    "sintesis-economica/",
                    "indicadores-de-produccion-y-demanda-nacional/",
                    "consumo-aparente-de-cemento/")
+```
 
 
-# 3) READ HTML PAGE
+# Reading HTML page
 
+```{r}
 data_page <- data_url %>%
   read_html
+```
 
 
-# 4) EXTRACT INFO AND CLEAN
+# Extracting info and tidying data
 
-# 4.1) Title
+## Title
+
+```{r}
 title <- data_page %>%
   html_node(xpath = "//h1") %>%
   html_text
 
-# 4.2) Notes
+cat(title)
+```
+
+## Notes
+
+```{r}
 notes <- data_page %>%
   html_node(xpath = "//*[@itemprop='description']") %>%
   html_text %>%
   gsub("\\.(\\D)", ".\n\\1", .)
 
-# 4.3) Table data 
+cat(notes)
+```
+
+
+## Table data
+
+```{r}
 table_cement <- data_page %>%
   html_table %>%
   data.frame %>%
   .[, -c(1)]
-
 
 names(table_cement) <- c("Date", "kt")
 
@@ -82,9 +102,13 @@ Sys.setlocale("LC_TIME", my_LC_TIME)
 # Sort by date
 table_cement <- table_cement[order(table_cement$Date), ]
 
-summary(table_cement)
+head(table_cement)
+```
 
-# Extract start and end dates
+
+## Extracting Start and End dates
+
+```{r}
 start_year <- table_cement$Date %>%
   min %>%
   format(., "%Y") %>%
@@ -104,46 +128,38 @@ end_month <- table_cement$Date %>%
   max %>%
   format(., "%m") %>%
   as.numeric
+```
 
 
-# 5) CONVERT TO TIME SERIES
+# Converting to Time Series
+
+```{r}
 ts_cement <- ts(table_cement$kt,
         start = c(start_year, start_month),
         end = c(end_year, end_month),
         deltat = 1/12)
 
 xts_cement <- as.xts(ts_cement)
+```
 
-# 6) SAVE xts AS csv
 
+# Saving xts as csv file
+
+```{r}
 xts_file_path <- "data/xts_cement.csv"
 
 write.zoo(xts_cement, file = xts_file_path, sep = ",")
+```
 
+# Plotting Apparent Cement Consumption
 
-
-# 7) PLOT DATA
+```{r}
 dygraph(xts_cement, main = title) %>%
   dySeries("V1", label = "miles Tm") %>%
   dyOptions(fillGraph = TRUE) %>%
   dyRangeSelector()
+```
 
 
-
-dyBarChart <- function(dygraph) {
-  dyPlotter(dygraph = dygraph,
-            name = "BarChart",
-            path = system.file("examples/plotters/barchart.js",
-                               package = "dygraphs"))
-}
-
-
-
-# dygraph(apply.yearly(xts_cement, sum)) %>%
-#   dySeries("V1", label = "miles Tm") %>%
-#   dyOptions(fillGraph = TRUE) %>%
-#   dyRangeSelector()
-
-dygraph(apply.yearly(xts_cement, sum)) %>%
-  dyRangeSelector() %>%
-  dyBarChart()
+# Links
+* [TEMÁTICAS: Indicadores de Producción y Demanda Nacional, Consumo aparente de cemento](http://tematicas.org/sintesis-economica/indicadores-de-produccion-y-demanda-nacional/consumo-aparente-de-cemento/)
