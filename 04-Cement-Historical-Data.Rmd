@@ -131,7 +131,7 @@ end_month <- table_cement$Date %>%
 ```
 
 
-# Converting to Time Series
+# Converting `data.frame` to `xts`
 
 ```{r}
 ts_cement <- ts(table_cement$kt,
@@ -143,7 +143,7 @@ xts_cement <- as.xts(ts_cement)
 ```
 
 
-# Saving xts as csv file
+# Saving `xts` as `csv` file
 
 ```{r}
 xts_file_path <- "data/xts_cement.csv"
@@ -162,4 +162,15 @@ dygraph(xts_cement, main = title) %>%
 
 
 # Links
+## Apparent Cement Consumption Data Sources:
 * [TEMÁTICAS: Indicadores de Producción y Demanda Nacional, Consumo aparente de cemento](http://tematicas.org/sintesis-economica/indicadores-de-produccion-y-demanda-nacional/consumo-aparente-de-cemento/)
+* [OFICEMEN: Evolución histórica mensual del consumo de cemento en España](https://www.oficemen.com/show_doc.asp?id_doc=692)
+* [INE: Consumo Aparente de Cemento (miles de Tm)](http://www.ine.es/jaxiT3/Datos.htm?path=/t38/p604/a2000/l0/&file=1300011.px)
+
+
+## Apparent Cement Consumption News:
+* [Libremercado: El consumo de cemento augura la destrucción de otros 550.000 empleos](http://www.libremercado.com/2011-11-24/el-consumo-de-cemento-augura-la-destruccion-de-otros-550000-empleos-1276442317/)
+
+
+## R Packages:
+* [dygraphs for R](https://rstudio.github.io/dygraphs/)
